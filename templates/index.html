@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Text Summarization</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      #article {
+        width: 100%;
+        height: 200px;
+        padding: 10px;
+        font-size: 16px;
+      }
+      button {
+        padding: 10px 20px;
+        font-size: 16px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        cursor: pointer;
+      }
+      #summary {
+        margin-top: 20px;
+        padding: 10px;
+        background-color: #f2f2f2;
+      }
+      #maximum #minimum {
+        width: 100px;
+        height: 50px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Text Summarization</h1>
+    <div>
+      <textarea id="article" placeholder="Enter your text here..."></textarea>
+      <textarea id="minimum" placeholder="Minimum Number"></textarea>
+      <textarea id="maximum" placeholder="Maximum Number"></textarea>
+    </br>
+      <button id="summarize-btn">Summarize</button>
+    </div>
+
+    <div id="summary"></div>
+
+    <script>
+      const articleInput = document.getElementById("article");
+      const minInput = document.getElementById("minimum");
+      const maxInput = document.getElementById("maximum");
+      const summarizeBtn = document.getElementById("summarize-btn");
+      const summaryDiv = document.getElementById("summary");
+
+      summarizeBtn.addEventListener("click", () => {
+        const article = articleInput.value.trim();
+        const minValue = parseInt(minInput.value); // Parse to integer
+        const maxValue = parseInt(maxInput.value); // Parse to integer
+
+        if (!article) {
+          summaryDiv.textContent = "Please enter some text to summarize.";
+          return;
+        }
+
+        // Validate minimum and maximum values (optional)
+        if (minValue < 0 || maxValue <= minValue) {
+          summaryDiv.textContent = "Invalid minimum and maximum values.";
+          return;
+        }
+
+        fetch("/summarize", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ article, minValue, maxValue }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.summary) {
+              summaryDiv.textContent = data.summary;
+              console.log(data);
+            } else {
+              summaryDiv.textContent = "Error: " + data.error;
+            }
+          })
+          .catch((error) => {
+            summaryDiv.textContent = "An error occurred: " + error;
+          });
+      });
+    </script>
+  </body>
+</html>
